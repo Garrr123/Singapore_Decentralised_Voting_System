@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 
+
 require('dotenv').config();
 
 const app = express();
@@ -9,7 +10,13 @@ const app = express();
 
 // Authorization middleware
 const authorizeUser = (req, res, next) => {
+  console.log("Parsed authorization:", req.query.Authorization);
+  const authHeader = req.headers.authorization;
+  console.log("Parsed authorization:", req);
+
+
   const token = req.query.Authorization?.split('Bearer ')[1];
+  console.log("Parsed token:", token);
 
   if (!token) {
     return res.status(401).send('<h1 align="center"> Login to Continue </h1>');

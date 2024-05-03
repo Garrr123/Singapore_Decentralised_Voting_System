@@ -38,6 +38,7 @@ try:
         database=os.environ['MYSQL_DB'],
     )
     cursor = cnx.cursor()
+    print("Database connected successfully!")  # Print a message to confirm successful connection
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print("Something is wrong with your user name or password")
