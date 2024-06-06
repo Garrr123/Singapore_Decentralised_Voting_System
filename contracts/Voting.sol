@@ -8,8 +8,14 @@ contract Voting {
         uint voteCount;
     }
 
+    struct Voter {
+        bool hasVoted;
+        bytes32 votingToken;
+        address account;
+    }
+
     mapping (uint => Candidate) public candidates;
-    mapping (address => bool) public voters;
+    mapping (address => Voter) public voters;
     address public owner;
     bool public votingReset;
 
@@ -28,16 +34,27 @@ contract Voting {
         return countCandidates;
     }
 
-    function vote(uint candidateID) public {
+    function registerVoter(bytes32 votingToken, address voterAccount) public {
+        require(voters[voterAccount].votingToken == 0, "Voter already registered");
+        voters[voterAccount] = Voter(false, votingToken, voterAccount);
+    }
+
+    function vote(uint candidateID, bytes32 votingToken) public {
         require((votingStart <= now) && (votingEnd > now), "Voting is not active");
         require(candidateID > 0 && candidateID <= countCandidates, "Invalid candidate ID");
-        require(!voters[msg.sender], "You have already voted");
-        voters[msg.sender] = true;
+        require(!voters[msg.sender].hasVoted, "You have already voted");
+        require(voters[msg.sender].votingToken == votingToken, "Invalid voting token");
+        require(voters[msg.sender].account == msg.sender, "Unauthorized voter");
+        voters[msg.sender].hasVoted = true;
         candidates[candidateID].voteCount++;
     }
 
-    function checkVote() public view returns(bool){
-        return voters[msg.sender];
+    function checkVote() public view returns(bool) {
+        return voters[msg.sender].hasVoted;
+    }
+
+    function generateVotingToken() public view returns(bytes32) {
+        return keccak256(abi.encodePacked(msg.sender, block.timestamp));
     }
 
     function getCountCandidates() public view returns(uint) {
@@ -63,7 +80,7 @@ contract Voting {
         
         // Reset all voters to false
         for (uint i = 1; i <= countCandidates; i++) {
-            voters[address(i)] = false;
+            delete voters[address(i)];
         }
         
         // Reset voting dates

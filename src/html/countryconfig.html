@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Country Configurations</title>
+</head>
+<body>
+    <h1>Admin Panel - Country Configurations</h1>
+    
+    <h2>Edit Country Configuration</h2>
+    <form id="editCountryForm">
+        <label for="countryName">Country Name:</label>
+        <input type="text" id="countryName" name="countryName"><br><br>
+        
+        <label for="votingStart">Voting Start:</label>
+        <input type="datetime-local" id="votingStart" name="votingStart"><br><br>
+        
+        <label for="votingEnd">Voting End:</label>
+        <input type="datetime-local" id="votingEnd" name="votingEnd"><br><br>
+        
+        <label for="minVotingAge">Minimum Voting Age:</label>
+        <input type="number" id="minVotingAge" name="minVotingAge"><br><br>
+        
+        <label for="maxCandidates">Maximum Candidates:</label>
+        <input type="number" id="maxCandidates" name="maxCandidates"><br><br>
+        
+        <label for="maxVotesPerVoter">Maximum Votes per Voter:</label>
+        <input type="number" id="maxVotesPerVoter" name="maxVotesPerVoter"><br><br>
+        
+        <!-- Additional fields for adding area and region configurations -->
+        <label for="areaName">Area Name:</label>
+        <input type="text" id="areaName" name="areaName"><br><br>
+        
+        <label for="regionName">Region Name:</label>
+        <input type="text" id="regionName" name="regionName"><br><br>
+        
+        <label for="regionVotingStart">Region Voting Start:</label>
+        <input type="datetime-local" id="regionVotingStart" name="regionVotingStart"><br><br>
+        
+        <label for="regionVotingEnd">Region Voting End:</label>
+        <input type="datetime-local" id="regionVotingEnd" name="regionVotingEnd"><br><br>
+        
+        <label for="regionMinVotingAge">Region Minimum Voting Age:</label>
+        <input type="number" id="regionMinVotingAge" name="regionMinVotingAge"><br><br>
+        
+        <label for="regionMaxCandidates">Region Maximum Candidates:</label>
+        <input type="number" id="regionMaxCandidates" name="regionMaxCandidates"><br><br>
+        
+        <label for="regionMaxVotesPerVoter">Region Maximum Votes per Voter:</label>
+        <input type="number" id="regionMaxVotesPerVoter" name="regionMaxVotesPerVoter"><br><br>
+        
+        <button id="addCountryConfig" type="button">Add Country Configuration</button>
+    </form>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../dist/countryconfig.bundle.js" type="module"></script>
+</body>
+</html>

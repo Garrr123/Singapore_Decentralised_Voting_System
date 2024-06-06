@@ -1,31 +1,23 @@
 const express = require('express');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-
+const fetch = require('node-fetch');
 
 require('dotenv').config();
 
 const app = express();
 
-
 // Authorization middleware
 const authorizeUser = (req, res, next) => {
-  console.log("Parsed authorization:", req.query.Authorization);
   const authHeader = req.headers.authorization;
-  console.log("Parsed authorization:", req);
-
-
-  const token = req.query.Authorization?.split('Bearer ')[1];
-  console.log("Parsed token:", token);
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
     return res.status(401).send('<h1 align="center"> Login to Continue </h1>');
   }
   
   try {
-    // Verify and decode the token
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY, { algorithms: ['HS256'] });
-
     req.user = decodedToken;
     next(); // Proceed to the next middleware
   } catch (error) {
@@ -33,37 +25,49 @@ const authorizeUser = (req, res, next) => {
   }
 };
 
-
+// Serve static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/html/login.html'));
 });
 
 app.get('/js/login.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/js/login.js'))
+  res.sendFile(path.join(__dirname, 'src/js/login.js'));
 });
 
 app.get('/css/login.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/css/login.css'))
+  res.sendFile(path.join(__dirname, 'src/css/login.css'));
 });
 
 app.get('/css/index.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/css/index.css'))
+  res.sendFile(path.join(__dirname, 'src/css/index.css'));
 });
 
 app.get('/css/admin.css', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/css/admin.css'))
+  res.sendFile(path.join(__dirname, 'src/css/admin.css'));
 });
 
 app.get('/assets/eth5.jpg', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/assets/eth5.jpg'))
+  res.sendFile(path.join(__dirname, 'src/assets/eth5.jpg'));
 });
 
 app.get('/js/app.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src/js/app.js'))
+  res.sendFile(path.join(__dirname, 'src/js/app.js'));
+});
+
+app.get('/js/countryconfig.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/js/countryconfig.js'));
 });
 
 app.get('/admin.html', authorizeUser, (req, res) => {
   res.sendFile(path.join(__dirname, 'src/html/admin.html'));
+});
+
+app.get('/success.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/html/success.html'));
+});
+
+app.get('/countryconfig.html', authorizeUser, (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/html/countryconfig.html'));
 });
 
 app.get('/index.html', authorizeUser, (req, res) => {
@@ -78,12 +82,17 @@ app.get('/dist/app.bundle.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'src/dist/app.bundle.js'));
 });
 
+app.get('/dist/countryconfig.bundle.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src/dist/countryconfig.bundle.js'));
+});
+
 // Serve the favicon.ico file
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/favicon.ico'));
 });
 
 // Start the server
-app.listen(8080, () => {
-  console.log('Server listening on http://localhost:8080');
+const localIP = '192.168.1.6'; 
+app.listen(8080, localIP, () => {
+  console.log(`Server listening on http://${localIP}:8080`);
 });

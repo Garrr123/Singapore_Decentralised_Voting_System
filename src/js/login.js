@@ -1,6 +1,23 @@
+const Web3 = require('web3');
+const contract = require('@truffle/contract');
+const jwt = require('jsonwebtoken');
+const votingArtifacts = require('../../build/contracts/Voting.json');
+const VotingContract = contract(votingArtifacts);
+
+window.addEventListener('load', async () => {
+  if (window.ethereum) {
+    window.web3 = new Web3(window.ethereum);
+    await window.ethereum.enable();
+  } else {
+    console.warn('No web3 provider detected. Install MetaMask or use a compatible browser.');
+  }
+
+  VotingContract.setProvider(window.web3.currentProvider);
+});
+
 const loginForm = document.getElementById('loginForm');
 
-loginForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const voter_id = document.getElementById('voter-id').value;
@@ -8,29 +25,75 @@ loginForm.addEventListener('submit', (event) => {
   const token = voter_id;
 
   const headers = {
-    'method': "GET",
+    'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,
   };
 
-  fetch(`http://127.0.0.1:8000/login?voter_id=${voter_id}&password=${password}`, { headers })
-  .then(response => {
-    if (response.ok) {
-      return response.json();
-    } else {
+  try {
+    const response = await fetch('http://192.168.1.6:8000/login', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ voter_id: voter_id, password: password })
+    });
+
+    if (!response.ok) {
       throw new Error('Login failed');
     }
-  })
-  .then(data => {
+
+    const data = await response.json();
+
     if (data.role === 'admin') {
-      console.log(data.role)
       localStorage.setItem('jwtTokenAdmin', data.token);
-      window.location.replace(`http://127.0.0.1:8080/admin.html?Authorization=Bearer ${localStorage.getItem('jwtTokenAdmin')}`);
-    } else if (data.role === 'user'){
-      localStorage.setItem('jwtTokenVoter', data.token);
-      window.location.replace(`http://127.0.0.1:8080/index.html?Authorization=Bearer ${localStorage.getItem('jwtTokenVoter')}`);
+      localStorage.setItem('votingToken', data.voting_token);
+      window.location.replace(`http://192.168.1.6:8080/admin.html?role=admin&Authorization=Bearer ${localStorage.getItem('jwtTokenAdmin')}`);
+    } else if (data.role === 'user') {
+      if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.enable();
+        } catch (error) {
+          console.error('User denied account access');
+          return;
+        }
+      } else {
+        console.warn('No web3 provider detected. Install MetaMask or use a compatible browser.');
+        return;
+      }
+
+      VotingContract.setProvider(window.web3.currentProvider);
+
+      try {
+        const accounts = await web3.eth.getAccounts();
+        const account = accounts[0];
+
+        const instance = await VotingContract.deployed();
+        const votingToken = await instance.generateVotingToken({ from: account });
+
+        await instance.registerVoter(votingToken, account, { from: account });
+
+        localStorage.setItem('votingToken', votingToken);
+
+        // Send voting token to backend to generate and send QR code
+        const qrResponse = await fetch('http://192.168.1.6:8000/send-voting-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ voter_id: voter_id, voting_token: votingToken })
+        });
+
+        if (!qrResponse.ok) {
+          throw new Error('Failed to send voting token');
+        }
+
+        // Redirect to success page after registration
+        window.location.replace(`http://192.168.1.6:8080/success.html`);
+      } catch (error) {
+        console.error('Failed to interact with smart contract:', error.message);
+      }
     }
-  })
-  .catch(error => {
+  } catch (error) {
     console.error('Login failed:', error.message);
-  });
+  }
 });

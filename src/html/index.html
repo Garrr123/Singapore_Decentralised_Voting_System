@@ -9,8 +9,9 @@
 <body>
   <div id="head" class="text-center mt-4">
     <h1>Decentralized Voting Using Ethereum Blockchain</h1>
-    <h2>Welcome for Voting</h2>
+    <h2>Welcome to Voting</h2>
     <h3>Voting Dates: <span id="dates"></span></h3>
+    <h3>Your Voting Token: <span id="votingTokenDisplay"></span></h3> <!-- Display voting token here -->
   </div>
 
   <div id="candidate" class="container mt-4"> 
@@ -37,7 +38,14 @@
     <p id="accountAddress"></p>
   </div>
 
-  <button id="resetButton" class="btn btn-danger mt-4">Reset Voting</button>
+  <div class="text-center mt-4">
+    <button id="getTokenButton" class="btn btn-info">Get Voting Token</button>
+    <button id="registerVoterButton" class="btn btn-success">Register Voter</button>
+  </div>
+
+  <div class="text-center mt-4">
+    <button id="resetButton" class="btn btn-danger">Reset Voting</button>
+  </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
