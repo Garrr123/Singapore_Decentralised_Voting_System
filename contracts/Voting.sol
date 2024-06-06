@@ -23,6 +23,8 @@ contract Voting {
     uint256 public votingEnd;
     uint256 public votingStart;
 
+    event VotingTokenGenerated(address indexed voter, bytes32 votingToken);
+
     constructor() public {
         owner = msg.sender;
     }
@@ -53,8 +55,11 @@ contract Voting {
         return voters[msg.sender].hasVoted;
     }
 
-    function generateVotingToken() public view returns(bytes32) {
-        return keccak256(abi.encodePacked(msg.sender, block.timestamp));
+    function generateVotingToken() public returns(bytes32) {
+        require(voters[msg.sender].votingToken == 0, "Voting token already generated");
+        bytes32 token = keccak256(abi.encodePacked(msg.sender, block.timestamp));
+        emit VotingTokenGenerated(msg.sender, token);
+        return token;
     }
 
     function getCountCandidates() public view returns(uint) {
