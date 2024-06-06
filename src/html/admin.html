@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <header class="text-center mt-4">
+    <h1>Decentralized Voting System</h1>
+  </header>
+
+  <main class="container mt-4">
+    <section class="add-candidate">
+      <h2>Add Candidate</h2>
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="Enter candidate's name" required>
+        </div>
+        <div class="form-group">
+          <label for="party">Party:</label>
+          <input type="text" class="form-control" id="party" name="party" placeholder="Enter candidate's party" required>
+        </div>
+        <input id="addCandidate" type="submit" name="submit" value="Add Candidate">
+        <p id="Aday"></p>
+    </section>
+
+    <section class="define-dates mt-4">
+      <h2>Define Voting Dates</h2>
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" class="form-control" id="startDate" name="startDate" required>
+        </div>
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" class="form-control" id="endDate" name="endDate" required>
+        </div>
+        <input id="addDate" type="submit" name="submit" value="Define Dates">
+        <p id="Aday"></p>
+      <p id="Aday"></p>
+    </section>
+  </main>
+
+  <section class="country-config mt-4">
+    <h2>Country Configuration</h2>
+    <button id="goToCountryConfig" class="btn btn-primary">Go to Country Configuration</button>
+  </section>
+
+  <footer class="text-center mt-4">
+    <button id="resetButton" class="btn btn-danger">Reset Voting</button>
+  </footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="../dist/app.bundle.js" type="module"></script>
+</body>
+</html>
