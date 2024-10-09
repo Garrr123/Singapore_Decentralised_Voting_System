@@ -3,59 +3,112 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Portal</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f5f6fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: -30px;
+    }
+
+    section h2 {
+      color: #007bff;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+    }
+
+    .dashboard table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .dashboard th, .dashboard td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #dee2e6;
+    }
+
+    .dashboard th {
+      background-color: #007bff;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
-  <header class="text-center mt-4">
-    <h1>Decentralized Voting System</h1>
+  <header class="text-center">
+    <h1 class="header-title">Decentralized Voting System</h1>
   </header>
 
   <main class="container mt-4">
-    <section class="add-candidate">
-      <h2>Add Candidate</h2>
-        <div class="form-group">
-          <label for="name">Name:</label>
-          <input type="text" class="form-control" id="name" name="name" placeholder="Enter candidate's name" required>
-        </div>
-        <div class="form-group">
-          <label for="party">Party:</label>
-          <input type="text" class="form-control" id="party" name="party" placeholder="Enter candidate's party" required>
-        </div>
-        <input id="addCandidate" type="submit" name="submit" value="Add Candidate">
-        <p id="Aday"></p>
+    <!-- Select Region -->
+    <section class="select-region">
+      <h2>Select Region</h2>
+      <div class="form-group">
+        <label for="region">Region:</label>
+        <select class="form-control" id="region" name="region" required></select>
+      </div>
     </section>
 
-    <section class="define-dates mt-4">
-      <h2>Define Voting Dates</h2>
-        <div class="form-group">
-          <label for="startDate">Start Date:</label>
-          <input type="date" class="form-control" id="startDate" name="startDate" required>
+    <!-- Retrieve and Add Teams -->
+    <section class="retrieve-teams">
+      <h2>Retrieve and Add Teams</h2>
+      <button class="btn btn-primary" id="retrieveTeams">Retrieve Teams</button>
+      <form id="teamForm" style="display:none;">
+        <div id="teamCheckboxes"></div>
+        <button type="button" class="btn btn-success mt-3" id="addSelectedTeams">Add Selected Teams</button>
+      </form>
+    </section>
+
+    <!-- Add Candidate -->
+    <section class="add-candidate" style="display:none;">
+      <div class="form-group" id="teamSelector" style="display:none;">
+        <label for="team">Select Team (For GRC):</label>
+        <select class="form-control" id="team" name="team"></select>
+      </div>
+
+
+    <!-- Display Candidates (New Section for Displaying Candidates) -->
+    <section class="display-candidates mt-4">
+      <h2>Candidates</h2>
+      <button class="btn btn-primary" id="getCandidates">Get Candidates</button>
+      <form id="candidateForm" style="display:none;">
+        <div id="candidateCheckboxes" class="mt-3">
+          <!-- Candidate checkboxes will be dynamically inserted here -->
         </div>
-        <div class="form-group">
-          <label for="endDate">End Date:</label>
-          <input type="date" class="form-control" id="endDate" name="endDate" required>
-        </div>
-        <input id="addDate" type="submit" name="submit" value="Define Dates">
-        <p id="Aday"></p>
-      <p id="Aday"></p>
+        <button type="button" class="btn btn-success mt-3" id="addSelectedCandidates">Add Selected Candidates</button>
+      </form>
+    </section>
+
+
+    <!-- Dashboard -->
+    <section class="dashboard mt-4">
+      <h2>Dashboard</h2>
+      <div id="dashboardContent"></div>
     </section>
   </main>
 
-  <section class="country-config mt-4">
-    <h2>Country Configuration</h2>
-    <button id="goToCountryConfig" class="btn btn-primary">Go to Country Configuration</button>
-  </section>
-
-  <footer class="text-center mt-4">
-    <button id="resetButton" class="btn btn-danger">Reset Voting</button>
-  </footer>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="../dist/app.bundle.js" type="module"></script>
+  <script src="../dist/admin.bundle.js" type="module"></script>
 </body>
 </html>

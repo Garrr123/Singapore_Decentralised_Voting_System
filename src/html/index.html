@@ -5,50 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Voting Page</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f0f2f5;
+      color: #333;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background-color: #003366;
+      color: #ffffff;
+      padding: 30px 0;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header h1 i {
+      color: #f8d32d;
+      margin-right: 10px;
+    }
+
+    header h2 {
+      font-size: 1.2rem;
+      font-weight: 300;
+      margin-bottom: 0;
+    }
+
+    header h3 {
+      font-size: 1rem;
+      font-weight: 300;
+      color: #e0e0e0;
+    }
+
+    main {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-top: -20px;
+      transition: box-shadow 0.3s ease;
+    }
+
+    main:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    #candidateHeader {
+      font-weight: 700;
+      color: #003366;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+    }
+
+    #candidateHeader i {
+      color: #0056b3;
+      margin-right: 10px;
+    }
+
+    .team-header {
+      background-color: #0056b3;
+      color: #ffffff;
+      padding: 10px 20px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+
+    .candidate-card {
+      background-color: #333;
+      color: #ffffff;
+      padding: 10px 20px;
+      margin: 8px 0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .candidate-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .candidate-card input[type="radio"] {
+      display: none;
+    }
+
+    .custom-radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #007bff;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      margin-right: 15px;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .custom-radio:before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background-color: #007bff;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .candidate-card input[type="radio"]:checked + .custom-radio:before {
+      opacity: 1;
+    }
+
+    .candidate-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      padding: 10px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+    }
+
+    #msg {
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #d9534f;
+      background-color: #f8d7da;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    #accountAddress {
+      font-size: 1rem;
+      font-weight: 300;
+      color: #6c757d;
+    }
+
+    #candidateSection, #voteSection, #account {
+      margin-top: 30px;
+    }
+
+    .icon-text {
+      display: flex;
+      align-items: center;
+    }
+
+    .icon-text i {
+      color: #333;
+      margin-right: 8px;
+    }
+  </style>
 </head>
 <body>
-  <div id="head" class="text-center mt-4">
-    <h1>Decentralized Voting Using Ethereum Blockchain</h1>
-    <h2>Welcome to Voting</h2>
-    <h3>Voting Dates: <span id="dates"></span></h3>
-    <h3>Your Voting Token: <span id="votingTokenDisplay"></span></h3> <!-- Display voting token here -->
-  </div>
+  <header>
+    <h1><i class="fas fa-shield-alt"></i> Secure Voting Portal</h1>
+    <h2>Welcome to Your Voting Dashboard</h2>
+    <h3>Voting Date: <span id="votingDate"></span> | Voting Time: <span id="votingTimes"></span></h3>
+  </header>
 
-  <div id="candidate" class="container mt-4"> 
-    <table class="table text-center">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Party</th>
-          <th>Total Vote</th>
-        </tr>
-      </thead>
-      <tbody id="boxCandidate"></tbody>
-    </table>
-    <br>
-    <div id="vote" class="text-center">
-      <p>Please select one of the candidates and click the vote button.</p>
+  <main class="container mt-5">
+    <section id="candidateSection">
+      <h2 id="candidateHeader"><i class="fas fa-users"></i> Candidates</h2>
+      <div id="candidateContent" class="text-left">
+        <!-- Repeat as needed for additional candidates -->
+      </div>
+    </section>
+
+    <section id="voteSection" class="text-center mt-4">
+      <p class="icon-text"><i class="fas fa-vote-yea"></i> Select a candidate and click the vote button.</p>
       <button id="voteButton" class="btn btn-primary" onclick="App.vote()" disabled>Vote</button>
-      <div id="msg"></div>
-      <div id="vote-box"></div>
-    </div>
-  </div>
+      <div id="msg">Error processing vote. Please try again.</div>
+    </section>
 
-  <div id="account" class="text-center">
-    <p id="accountAddress"></p>
-  </div>
-
-  <div class="text-center mt-4">
-    <button id="getTokenButton" class="btn btn-info">Get Voting Token</button>
-    <button id="registerVoterButton" class="btn btn-success">Register Voter</button>
-  </div>
-
-  <div class="text-center mt-4">
-    <button id="resetButton" class="btn btn-danger">Reset Voting</button>
-  </div>
+    <section id="account" class="text-center mt-4">
+      <p id="accountAddress">Your Account: <span id="accountAddressValue"></span></p>
+    </section>
+  </main>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
   <script src="../dist/app.bundle.js" type="module"></script>
 </body>
 </html>

@@ -1,235 +1,194 @@
 const Web3 = require('web3');
 const contract = require('@truffle/contract');
 const jwt = require('jsonwebtoken');
-const ethers = require('ethers');
-const votingArtifacts = require('../../build/contracts/Voting.json');
+const votingArtifacts = require('../../build/contracts/VoterContract.json');
 const VotingContract = contract(votingArtifacts);
+const votingFactoryArtifacts = require('../../build/contracts/VotingFactory.json');
+const VotingFactoryContract = contract(votingFactoryArtifacts);
+require('dotenv').config();
 
 window.App = {
-  eventStart: function() {
+  votingToken: null, // Define votingToken here
+
+  getSecretKey: async function() {
+    const response = await fetch('/get-secret-key');
+    const data = await response.json();
+    return data.secretKey;
+  },
+
+  eventStart: async function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const userRole = urlParams.get('role');
+    const token = urlParams.get('token');
 
-    window.ethereum.request({ method: 'eth_requestAccounts' }).then(function(accounts) {
-      if (accounts.length === 0) {
-        console.error("No accounts found");
-        return;
-      }
-      VotingContract.setProvider(window.ethereum);
-      App.account = accounts[0];
-      VotingContract.defaults({ from: accounts[0], gas: 6654755 });
+    if (!token) {
+      console.error("Missing voting token in URL");
+      return;
+    }
 
-      const web3 = new Web3(window.ethereum);
-      web3.eth.net.getId().then(networkId => {
-        console.log("Current network ID:", networkId);
-        if (networkId === 1) {
-          console.log("Connected to the Mainnet");
-        } else if (networkId === 3) {
-          console.log("Connected to the Ropsten Test Network");
-        } else {
-          console.log("Connected to an unknown network");
+    try {
+      App.secretKey = await App.getSecretKey();
+      const decoded = jwt.verify(token, App.secretKey);
+      App.votingToken = decoded.voting_token; // Set votingToken here
+
+      window.ethereum.request({ method: 'eth_requestAccounts' }).then(async function(accounts) {
+        if (accounts.length === 0) {
+          console.error("No accounts found");
+          return;
         }
-      }).catch(error => {
-        console.error("Error getting network ID:", error);
-      });
+        App.account = accounts[0];
 
-      $("#accountAddress").html("Your Account: " + accounts[0]);
+        const web3 = new Web3(window.ethereum);
+        VotingFactoryContract.setProvider(web3.currentProvider);
+        VotingContract.setProvider(web3.currentProvider);
+        VotingFactoryContract.defaults({ from: accounts[0], gas: 6654755 });
+        VotingContract.defaults({ from: accounts[0], gas: 6654755 });
 
-      VotingContract.deployed().then(function(instance) {
-        if (userRole === 'admin') {
-          $('#adminFunctions').show();
-          $('#addCandidate').click(function() {
-            var nameCandidate = $('#name').val();
-            var partyCandidate = $('#party').val();
-            instance.addCandidate(nameCandidate, partyCandidate, { from: App.account }).then(function(result) {
-              console.log("Candidate added successfully");
-            }).catch(function(err) {
-              console.error("Error adding candidate:", err.message);
-            });
-          });
+        const factoryInstance = await VotingFactoryContract.deployed();
+        const votingContractAddress = await factoryInstance.getVotingContractByToken(App.votingToken);
 
-          $('#addDate').click(function() {
-            var startDate = Date.parse(document.getElementById("startDate").value) / 1000;
-            var endDate = Date.parse(document.getElementById("endDate").value) / 1000;
-            instance.setDates(startDate, endDate).then(function(rslt) {
-              console.log("Dates set successfully");
-            }).catch(function(err) {
-              console.error("Error setting dates:", err.message);
-            });
-          });
+        if (!votingContractAddress || votingContractAddress === '0x0000000000000000000000000000000000000000') {
+          console.error("Voting contract not found for the provided token");
+          return;
         }
 
-        instance.getDates().then(function(result) {
-          var startDate = new Date(result[0] * 1000);
-          var endDate = new Date(result[1] * 1000);
-          $("#dates").text(startDate.toDateString("#DD#/#MM#/#YYYY#") + " - " + endDate.toDateString("#DD#/#MM#/#YYYY#"));
+        App.contractInstance = new web3.eth.Contract(VotingContract.abi, votingContractAddress);
+
+        $("#accountAddress").html("Your Account: " + accounts[0]);
+
+        App.contractInstance.methods.getVotingTimes().call().then(function(result) {
+          const votingDate = new Date(result[0] * 1000).toDateString();
+          const startTime = new Date(result[1] * 1000).toLocaleTimeString();
+          const endTime = new Date(result[2] * 1000).toLocaleTimeString();
+          $("#votingDate").text(votingDate);
+          $("#votingTimes").text(`${startTime} - ${endTime}`);
         }).catch(function(err) {
-          console.error("ERROR! " + err.message);
+          console.error("ERROR in getVotingTimes: " + err.message);
         });
 
-        instance.getCountCandidates().then(function(countCandidates) {
-          for (var i = 0; i < countCandidates; i++) {
-            instance.getCandidate(i + 1).then(function(data) {
-              var id = data[0];
-              var name = data[1];
-              var party = data[2];
-              var voteCount = data[3];
-              var viewCandidates = `<tr><td> <input class="form-check-input" type="radio" name="candidate" value="${id}" id=${id}>` + name + "</td><td>" + party + "</td><td>" + voteCount + "</td></tr>";
-              $("#boxCandidate").append(viewCandidates);
-            });
+        App.contractInstance.methods.isGRC().call().then(async function(isGRC) {
+          if (isGRC) {
+            // Display teams for GRC
+            for (let i = 1; i <= await App.contractInstance.methods.countTeams().call(); i++) {
+              const team = await App.contractInstance.methods.teams(i).call();
+              let candidatesHTML = `<div class="team-header">
+                                      <input type="radio" name="team" value="${team.id}" class="form-check-input">
+                                      <label>${team.name}</label>
+                                      <ul>`;
+        
+              for (let j = 1; j <= team.candidateCount; j++) {
+                // Fetch candidate details
+                const candidate = await App.contractInstance.methods.getTeamCandidate(team.id, j).call();
+                const candidateParty = candidate[1] || "Party Not Found";
+                candidatesHTML += `<li>${candidateParty}</li>`;
+              }
+              candidatesHTML += `</ul></div>`;
+              $("#candidateContent").append(candidatesHTML);
+            }
+          } else {
+            // Handle SMC display as usual
+            for (let i = 1; i <= await App.contractInstance.methods.getCandidateCount().call(); i++) {
+              const candidate = await App.contractInstance.methods.getCandidate(i).call();
+              const candidateHTML = `<tr>
+                                      <td><input type="radio" name="candidate"class="form-check-input">${candidate.name}</td>
+                                      <td>${candidate.party}</td>
+                                    </tr>`;
+              $("#boxCandidate").append(candidateHTML);
+            }
           }
-          window.countCandidates = countCandidates;
-        });
+        
+          $("#voteButton").attr("disabled", false);
+        }).catch(err => console.error("Error determining GRC or SMC:", err.message));
 
-        instance.checkVote().then(function(voted) {
-          console.log(voted);
+        App.contractInstance.methods.checkVote(App.account).call().then(function(voted) {
           if (!voted) {
             $("#voteButton").attr("disabled", false);
           }
-        });
-      }).catch(function(err) {
-        console.error("ERROR! " + err.message);
-      });
-    }).catch(function(error) {
-      console.error("Failed to request accounts:", error);
-    });
-  },
-
-  verifyVotingToken: function() {
-    const token = localStorage.getItem('votingToken');
-    if (!token) {
-      console.error("No voting token found");
-      return false;
-    }
-    console.log("Voting token found:", token);
-    return true;
-  },
-
-  getToken: function() {
-    VotingContract.deployed().then(function(instance) {
-      instance.voters(App.account).then(function(voter) {
-        const token = voter.votingToken;
-        if (token) {
-          $("#votingTokenDisplay").text(`Your Voting Token: ${token}`);
-          localStorage.setItem('votingToken', token); // Store the token in localStorage
-        } else {
-          console.error("No voting token found for this account");
-        }
-      }).catch(function(err) {
-        console.error("Error obtaining voting token:", err.message);
-      });
-    }).catch(function(err) {
-      console.error("ERROR! " + err.message);
-    });
-  },
-
-  registerVoter: function() {
-    VotingContract.deployed().then(function(instance) {
-      instance.generateVotingToken().then(function(token) {
-        localStorage.setItem('votingToken', token);
-        instance.registerVoter(token).then(function() {
-          console.log("Voter registered with token:", token);
         }).catch(function(err) {
-          console.error("Error registering voter:", err.message);
+          console.error("ERROR in checkVote: " + err.message);
         });
-      }).catch(function(err) {
-        console.error("Error generating voting token:", err.message);
+
+      }).catch(function(error) {
+        console.error("Failed to request accounts:", error);
       });
-    }).catch(function(err) {
-      console.error("ERROR! " + err.message);
-    });
+
+    } catch (error) {
+      console.error("Invalid token:", error);
+    }
   },
 
   vote: function() {
-    if (!App.verifyVotingToken()) {
+    console.log("Starting vote function...");
+    const token = new URLSearchParams(window.location.search).get('token');
+    console.log("Voting token from URL:", token);
+    
+    if (!token) {
       $("#msg").html("<p>Invalid or missing voting token. Please login again.</p>");
       return;
     }
-
-    var candidateID = $("input[name='candidate']:checked").val();
-    if (!candidateID) {
-      $("#msg").html("<p>Please vote for a candidate.</p>");
-      return;
-    }
-
-    const votingToken = localStorage.getItem('votingToken');
-
-    VotingContract.deployed().then(function(instance) {
-      // Call the vote function with the stored voting token
-      instance.vote(parseInt(candidateID), votingToken).then(function(result) {
-        $("#voteButton").attr("disabled", true);
-        $("#msg").html("<p>Voted</p>");
-        window.location.reload(1);
-      }).catch(function(err) {
-        console.error("Vote transaction error:", err.message);
-        console.error("Vote transaction error data:", err.data);
-      });
-    }).catch(function(err) {
-      console.error("Vote transaction error:", err.message);
-      console.error("Vote transaction error data:", err.data);
+  
+    let selectionID;
+  
+    App.contractInstance.methods.isGRC().call().then(isGRC => {
+      console.log("Is GRC:", isGRC);
+  
+      if (isGRC) {
+        selectionID = $("input[name='team']:checked").val();
+        console.log("Selected Team ID:", selectionID);
+        
+        if (!selectionID) {
+          $("#msg").html("<p>Please select a team.</p>");
+          return;
+        }
+        
+        console.log("Attempting to send voteGRC transaction with token:", App.votingToken);
+        App.contractInstance.methods.voteGRC(parseInt(selectionID), App.votingToken).send({ from: App.account, gas: 500000 })
+          .then(result => handleVoteSuccess(result))
+          .catch(err => {
+            console.error("Vote transaction error:", JSON.stringify(err, null, 2)); // Detailed error info
+            handleVoteError(err);
+          });
+  
+      } else {
+        selectionID = $("input[name='candidate']:checked").val();
+        console.log("Selected Candidate ID:", selectionID);
+        
+        if (!selectionID) {
+          $("#msg").html("<p>Please select a candidate.</p>");
+          return;
+        }
+        
+        console.log("Attempting to send voteSMC transaction with token:", App.votingToken);
+        App.contractInstance.methods.voteSMC(parseInt(selectionID), App.votingToken).send({ from: App.account, gas: 500000 })
+          .then(result => handleVoteSuccess(result))
+          .catch(err => {
+            console.error("Vote transaction error:", JSON.stringify(err, null, 2)); // Detailed error info
+            handleVoteError(err);
+          });
+      }
+    }).catch(err => {
+      console.error("Error in vote process:", err.message);
     });
   }
 };
 
+function handleVoteSuccess(result) {
+  $("#voteButton").attr("disabled", true);
+  $("#msg").html("<p>Voted successfully</p>");
+  console.log("Vote transaction result:", result);
+}
+
+function handleVoteError(err) {
+  console.error("Vote transaction error:", err.message);
+  $("#msg").html("<p>Error processing vote. Please try again.</p>");
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-  // Event listener for the reset button
-  const resetButton = document.getElementById("resetButton");
-  if (resetButton) {
-    resetButton.onclick = function() {
-      resetVoting();
-    };
-  }
-
-  const goToCountryConfig = document.getElementById("goToCountryConfig");
-  if (goToCountryConfig) {
-    goToCountryConfig.onclick = function() {
-      window.location.replace(`http://192.168.1.6:8080/countryconfig.html?Authorization=Bearer ${localStorage.getItem('jwtTokenAdmin')}`);
-    };
-  }
-
-  // Event listener for the getToken button
-  const getTokenButton = document.getElementById("getTokenButton");
-  if (getTokenButton) {
-    getTokenButton.onclick = function() {
-      App.getToken();
-    };
-  }
-
-  // Event listener for the registerVoter button
-  const registerVoterButton = document.getElementById("registerVoterButton");
-  if (registerVoterButton) {
-    registerVoterButton.onclick = function() {
-      App.registerVoter();
+  const voteButton = document.getElementById("voteButton");
+  if (voteButton) {
+    voteButton.onclick = function() {
+      App.vote();
     };
   }
 
   window.App.eventStart();
 });
-
-function resetVoting() {
-  if (!window.ethereum) {
-    console.error("MetaMask or compatible wallet not detected");
-    return;
-  }
-
-  window.ethereum.request({ method: 'eth_requestAccounts' }).then(function(accounts) {
-    var defaultAccount = accounts[0]; // Assuming the first account is the default
-    if (!defaultAccount) {
-      console.error("No accounts found");
-      return;
-    }
-
-    VotingContract.deployed().then(function(instance) {
-      // Call resetVoting function with the sender's address
-      instance.resetVoting({ from: defaultAccount }).then(function(result) {
-        console.log("Voting reset successfully");
-      }).catch(function(error) {
-        console.error("Failed to reset voting:", error);
-      });
-    }).catch(function(err) {
-      console.error("Error deploying contract:", err);
-    });
-  }).catch(function(error) {
-    console.error("Failed to request accounts:", error);
-  });
-}

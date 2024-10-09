@@ -1,61 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Country Configurations</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voting Factory</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #f5f6fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    main {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: -30px;
+    }
+
+    section h2 {
+      color: #007bff;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    footer {
+      margin-top: 40px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #004085;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .dashboard table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .dashboard table, .dashboard th, .dashboard td {
+      border: 1px solid #dee2e6;
+    }
+
+    .dashboard th, .dashboard td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .dashboard th {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .text-center button {
+      margin: 5px 0;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .add-region, .dashboard, .country-config {
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f8f9fa;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 </head>
 <body>
-    <h1>Admin Panel - Country Configurations</h1>
-    
-    <h2>Edit Country Configuration</h2>
-    <form id="editCountryForm">
-        <label for="countryName">Country Name:</label>
-        <input type="text" id="countryName" name="countryName"><br><br>
-        
-        <label for="votingStart">Voting Start:</label>
-        <input type="datetime-local" id="votingStart" name="votingStart"><br><br>
-        
-        <label for="votingEnd">Voting End:</label>
-        <input type="datetime-local" id="votingEnd" name="votingEnd"><br><br>
-        
-        <label for="minVotingAge">Minimum Voting Age:</label>
-        <input type="number" id="minVotingAge" name="minVotingAge"><br><br>
-        
-        <label for="maxCandidates">Maximum Candidates:</label>
-        <input type="number" id="maxCandidates" name="maxCandidates"><br><br>
-        
-        <label for="maxVotesPerVoter">Maximum Votes per Voter:</label>
-        <input type="number" id="maxVotesPerVoter" name="maxVotesPerVoter"><br><br>
-        
-        <!-- Additional fields for adding area and region configurations -->
-        <label for="areaName">Area Name:</label>
-        <input type="text" id="areaName" name="areaName"><br><br>
-        
-        <label for="regionName">Region Name:</label>
-        <input type="text" id="regionName" name="regionName"><br><br>
-        
-        <label for="regionVotingStart">Region Voting Start:</label>
-        <input type="datetime-local" id="regionVotingStart" name="regionVotingStart"><br><br>
-        
-        <label for="regionVotingEnd">Region Voting End:</label>
-        <input type="datetime-local" id="regionVotingEnd" name="regionVotingEnd"><br><br>
-        
-        <label for="regionMinVotingAge">Region Minimum Voting Age:</label>
-        <input type="number" id="regionMinVotingAge" name="regionMinVotingAge"><br><br>
-        
-        <label for="regionMaxCandidates">Region Maximum Candidates:</label>
-        <input type="number" id="regionMaxCandidates" name="regionMaxCandidates"><br><br>
-        
-        <label for="regionMaxVotesPerVoter">Region Maximum Votes per Voter:</label>
-        <input type="number" id="regionMaxVotesPerVoter" name="regionMaxVotesPerVoter"><br><br>
-        
-        <button id="addCountryConfig" type="button">Add Country Configuration</button>
-    </form>
+  <header class="text-center">
+    <h1 class="header-title">Voting Factory</h1>
+  </header>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="../dist/countryconfig.bundle.js" type="module"></script>
+  <main class="container mt-4">
+    <section class="add-region">
+      <h2>Insert Region to Voting Factory</h2>
+      <form id="votingForm">
+        <div class="form-group">
+          <label for="region">Region:</label>
+          <input type="text" class="form-control" id="region" name="region" required>
+        </div>
+        <div class="form-group">
+          <label for="votingDate">Voting Date:</label>
+          <input type="date" class="form-control" id="votingDate" name="votingDate" required>
+        </div>
+        <div class="form-group">
+          <label for="votingStartTime">Voting Start Time:</label>
+          <input type="time" class="form-control" id="votingStartTime" name="votingStartTime" required>
+        </div>
+        <div class="form-group">
+          <label for="votingEndTime">Voting End Time:</label>
+          <input type="time" class="form-control" id="votingEndTime" name="votingEndTime" required>
+        </div>
+        <div class="form-group">
+          <label for="minVotingAge">Minimum Voting Age:</label>
+          <input type="number" class="form-control" id="minVotingAge" name="minVotingAge" required>
+        </div>
+
+        <div class="form-group">
+            <label for="isGRC">Is this a GRC?</label>
+            <input type="checkbox" id="isGRC" name="isGRC">
+        </div>
+        <div class="form-group">
+          <label for="maxVoters">Maximum Voters:</label>
+          <input type="number" class="form-control" id="maxVoters" name="maxVoters" required>
+        </div>
+        <button type="submit" id="addCountryConfig" class="btn btn-primary">Create Voting Contract</button>
+      </form>
+      <div id="accountAddress" class="mt-3"></div>
+      <div id="result" class="mt-3"></div>
+    </section>
+
+    <section class="dashboard mt-4">
+      <h2>All Regions</h2>
+      <div id="regionsList"></div>
+    </section>
+
+    <section class="search-region mt-4">
+      <h2>Search for a Specific Region</h2>
+      <div class="form-group">
+        <input type="text" class="form-control" id="searchRegion" placeholder="Enter region name">
+      </div>
+      <button id="searchRegionButton" class="btn btn-primary">Search</button>
+      <div id="searchResult" class="mt-3"></div>
+    </section>
+  </main>
+
+  <script src="../dist/countryconfig.bundle.js"></script>
 </body>
 </html>
