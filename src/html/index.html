@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body {
-      background-color: #f0f2f5;
-      color: #333;
+      background-color: #1e1e2f;
+      color: #e0e0e0;
       font-family: Arial, sans-serif;
     }
 
     header {
-      background-color: #003366;
-      color: #ffffff;
+      background-color: #333;
+      color: #f0f0f0;
       padding: 30px 0;
       text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     header h1 {
@@ -39,30 +39,31 @@
       font-size: 1.2rem;
       font-weight: 300;
       margin-bottom: 0;
+      color: #ddd;
     }
 
     header h3 {
       font-size: 1rem;
       font-weight: 300;
-      color: #e0e0e0;
+      color: #bbbbbb;
     }
 
     main {
-      background-color: #ffffff;
+      background-color: #2e2e3e;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
       margin-top: -20px;
       transition: box-shadow 0.3s ease;
     }
 
     main:hover {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
     }
 
     #candidateHeader {
       font-weight: 700;
-      color: #003366;
+      color: #6a70dd;
       margin-bottom: 20px;
       font-size: 1.8rem;
       display: flex;
@@ -70,12 +71,12 @@
     }
 
     #candidateHeader i {
-      color: #0056b3;
+      color: #4b4fa3;
       margin-right: 10px;
     }
 
     .team-header {
-      background-color: #0056b3;
+      background-color: #4b4fa3;
       color: #ffffff;
       padding: 10px 20px;
       margin-top: 15px;
@@ -87,9 +88,9 @@
     }
 
     .candidate-card {
-      background-color: #333;
-      color: #ffffff;
-      padding: 10px 20px;
+      background-color: #444;
+      color: #e0e0e0;
+      padding: 15px 20px;
       margin: 8px 0;
       border-radius: 8px;
       display: flex;
@@ -102,7 +103,7 @@
 
     .candidate-card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .candidate-card input[type="radio"] {
@@ -112,7 +113,7 @@
     .custom-radio {
       width: 20px;
       height: 20px;
-      border: 2px solid #007bff;
+      border: 2px solid #6a70dd;
       border-radius: 50%;
       position: relative;
       cursor: pointer;
@@ -128,7 +129,7 @@
       transform: translate(-50%, -50%);
       width: 12px;
       height: 12px;
-      background-color: #007bff;
+      background-color: #6a70dd;
       border-radius: 50%;
       opacity: 0;
       transition: opacity 0.2s;
@@ -144,8 +145,8 @@
     }
 
     .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
+      background-color: #6a70dd;
+      border-color: #6a70dd;
       padding: 10px 40px;
       font-size: 1.2rem;
       font-weight: 600;
@@ -155,8 +156,8 @@
     }
 
     .btn-primary:hover {
-      background-color: #0056b3;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      background-color: #575db7;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
       transform: scale(1.05);
     }
 
@@ -174,7 +175,7 @@
     #accountAddress {
       font-size: 1rem;
       font-weight: 300;
-      color: #6c757d;
+      color: #aaaaaa;
     }
 
     #candidateSection, #voteSection, #account {
@@ -184,10 +185,11 @@
     .icon-text {
       display: flex;
       align-items: center;
+      color: #aaa;
     }
 
     .icon-text i {
-      color: #333;
+      color: #f0f0f0;
       margin-right: 8px;
     }
   </style>
@@ -203,7 +205,7 @@
     <section id="candidateSection">
       <h2 id="candidateHeader"><i class="fas fa-users"></i> Candidates</h2>
       <div id="candidateContent" class="text-left">
-        <!-- Repeat as needed for additional candidates -->
+        <!-- Candidate cards will be dynamically inserted here -->
       </div>
     </section>
 

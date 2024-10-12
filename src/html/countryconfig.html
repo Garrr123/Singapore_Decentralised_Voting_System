@@ -7,71 +7,59 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
+    /* Darker theme styling */
     body {
-      background-color: #f5f6fa;
-      color: #333;
+      background-color: #1c1c1c;
+      color: #e0e0e0;
     }
 
     header {
-      background-color: #007bff;
+      background-color: #333;
       color: #fff;
-      padding: 20px 0;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
     main {
-      background-color: #fff;
+      background-color: #2a2a2a;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
       margin-top: -30px;
     }
 
     section h2 {
-      color: #007bff;
+      color: #6a70dd;
       font-size: 1.5rem;
       margin-bottom: 20px;
     }
 
-    footer {
-      margin-top: 40px;
-    }
-
     .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
+      background-color: #6a70dd;
+      border-color: #6a70dd;
       transition: background-color 0.3s ease;
+      color: #fff;
     }
 
     .btn-primary:hover {
-      background-color: #0056b3;
-      border-color: #004085;
-    }
-
-    .btn-danger {
-      background-color: #dc3545;
-      border-color: #dc3545;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-danger:hover {
-      background-color: #c82333;
-      border-color: #bd2130;
+      background-color: #575ac7;
+      border-color: #4b4ec2;
     }
 
     .form-group label {
       font-weight: bold;
-      color: #333;
+      color: #f1f1f1;
     }
 
     .dashboard table {
       width: 100%;
       margin-top: 20px;
       border-collapse: collapse;
+      color: #fff;
     }
 
     .dashboard table, .dashboard th, .dashboard td {
-      border: 1px solid #dee2e6;
+      border: 1px solid #444;
     }
 
     .dashboard th, .dashboard td {
@@ -80,12 +68,8 @@
     }
 
     .dashboard th {
-      background-color: #007bff;
+      background-color: #6a70dd;
       color: #fff;
-    }
-
-    .text-center button {
-      margin: 5px 0;
     }
 
     .header-title {
@@ -94,71 +78,116 @@
       letter-spacing: 1px;
     }
 
-    .add-region, .dashboard, .country-config {
+    .add-region, .dashboard, .search-region {
       padding: 20px;
       border-radius: 10px;
-      background-color: #f8f9fa;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: #3a3a3a;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       margin-bottom: 30px;
+    }
+
+    .form-control {
+      background-color: #444;
+      border: 1px solid #555;
+      color: #fff;
+    }
+
+    .form-control:focus {
+      background-color: #555;
+      color: #fff;
+    }
+
+    #regionsList .region-card {
+      background-color: #444;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .region-card h4 {
+      color: #6a70dd;
+    }
+
+    .region-card p {
+      margin: 0;
+    }
+
+    .icon-label {
+      color: #6a70dd;
+      margin-right: 10px;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
 </head>
 <body>
   <header class="text-center">
-    <h1 class="header-title">Voting Factory</h1>
+    <h1 class="header-title">Voting Factory <i class="fas fa-vote-yea"></i></h1>
   </header>
 
   <main class="container mt-4">
     <section class="add-region">
-      <h2>Insert Region to Voting Factory</h2>
+      <h2><i class="fas fa-plus-circle icon-label"></i> Insert Region to Voting Factory</h2>
       <form id="votingForm">
         <div class="form-group">
-          <label for="region">Region:</label>
+          <label for="region"><i class="fas fa-map-marker-alt icon-label"></i> Region:</label>
           <input type="text" class="form-control" id="region" name="region" required>
         </div>
         <div class="form-group">
-          <label for="votingDate">Voting Date:</label>
+          <label for="votingDate"><i class="fas fa-calendar-alt icon-label"></i> Voting Date:</label>
           <input type="date" class="form-control" id="votingDate" name="votingDate" required>
         </div>
         <div class="form-group">
-          <label for="votingStartTime">Voting Start Time:</label>
+          <label for="votingStartTime"><i class="fas fa-clock icon-label"></i> Voting Start Time:</label>
           <input type="time" class="form-control" id="votingStartTime" name="votingStartTime" required>
         </div>
         <div class="form-group">
-          <label for="votingEndTime">Voting End Time:</label>
+          <label for="votingEndTime"><i class="fas fa-clock icon-label"></i> Voting End Time:</label>
           <input type="time" class="form-control" id="votingEndTime" name="votingEndTime" required>
         </div>
         <div class="form-group">
-          <label for="minVotingAge">Minimum Voting Age:</label>
+          <label for="minVotingAge"><i class="fas fa-user icon-label"></i> Minimum Voting Age:</label>
           <input type="number" class="form-control" id="minVotingAge" name="minVotingAge" required>
         </div>
-
         <div class="form-group">
-            <label for="isGRC">Is this a GRC?</label>
-            <input type="checkbox" id="isGRC" name="isGRC">
+          <label for="isGRC"><i class="fas fa-users icon-label"></i> Is this a GRC?</label>
+          <input type="checkbox" id="isGRC" name="isGRC">
         </div>
         <div class="form-group">
-          <label for="maxVoters">Maximum Voters:</label>
+          <label for="maxVoters"><i class="fas fa-user-friends icon-label"></i> Maximum Voters:</label>
           <input type="number" class="form-control" id="maxVoters" name="maxVoters" required>
         </div>
-        <button type="submit" id="addCountryConfig" class="btn btn-primary">Create Voting Contract</button>
+        <button type="submit" id="addCountryConfig" class="btn btn-primary btn-block"><i class="fas fa-check-circle"></i> Create Voting Contract</button>
       </form>
       <div id="accountAddress" class="mt-3"></div>
       <div id="result" class="mt-3"></div>
     </section>
 
     <section class="dashboard mt-4">
-      <h2>All Regions</h2>
-      <div id="regionsList"></div>
+      <h2><i class="fas fa-globe"></i> All Regions</h2>
+      <div id="regionsList" class="row">
+        <!-- Dynamic region display with individual cards -->
+        <!-- Sample region card (to be populated dynamically) -->
+        <!--
+        <div class="col-md-4 region-card">
+          <h4>Region Name</h4>
+          <p><i class="fas fa-calendar-alt icon-label"></i> Voting Date: <strong>2024-05-25</strong></p>
+          <p><i class="fas fa-clock icon-label"></i> Voting Time: <strong>9:00 AM - 9:00 PM</strong></p>
+          <p><i class="fas fa-user icon-label"></i> Minimum Age: <strong>21</strong></p>
+          <p><i class="fas fa-users icon-label"></i> Type: <strong>GRC</strong></p>
+          <p><i class="fas fa-user-friends icon-label"></i> Max Voters: <strong>2000</strong></p>
+        </div>
+        -->
+      </div>
     </section>
 
     <section class="search-region mt-4">
-      <h2>Search for a Specific Region</h2>
+      <h2><i class="fas fa-search icon-label"></i> Search for a Specific Region</h2>
       <div class="form-group">
         <input type="text" class="form-control" id="searchRegion" placeholder="Enter region name">
       </div>
-      <button id="searchRegionButton" class="btn btn-primary">Search</button>
+      <button id="searchRegionButton" class="btn btn-primary btn-block"><i class="fas fa-search"></i> Search</button>
       <div id="searchResult" class="mt-3"></div>
     </section>
   </main>

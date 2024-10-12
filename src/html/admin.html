@@ -4,38 +4,62 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Portal</title>
+  <title>Admin Portal - Decentralized Voting System</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body {
-      background-color: #f5f6fa;
-      color: #333;
+      background-color: #1e1e2f;
+      color: #c9c9d1;
+      font-family: Arial, sans-serif;
     }
 
     header {
-      background-color: #007bff;
+      background-color: #121225;
       color: #fff;
-      padding: 20px 0;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 15px 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    header img {
+      width: 50px;
+      height: auto;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0;
     }
 
     main {
-      background-color: #fff;
+      background-color: #252535;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       margin-top: -30px;
     }
 
     section h2 {
-      color: #007bff;
+      color: #4a90e2;
       font-size: 1.5rem;
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .icon {
+      color: #4a90e2;
+      margin-right: 10px;
     }
 
     .form-group label {
       font-weight: bold;
+      color: #b0b3c6;
     }
 
     .dashboard table {
@@ -47,66 +71,100 @@
     .dashboard th, .dashboard td {
       padding: 10px;
       text-align: left;
-      border: 1px solid #dee2e6;
+      border: 1px solid #38384f;
+      color: #ffffff; /* Changed to white for better contrast */
     }
 
     .dashboard th {
-      background-color: #007bff;
+      background-color: #4a90e2;
       color: #fff;
+    }
+
+    .btn-primary, .btn-success {
+      background-color: #4a90e2;
+      border: none;
+    }
+
+    .btn-primary:hover, .btn-success:hover {
+      background-color: #357abd;
+    }
+
+    .btn i {
+      margin-right: 8px;
     }
   </style>
 </head>
 <body>
+  <!-- Header with Logo and Title -->
   <header class="text-center">
-    <h1 class="header-title">Decentralized Voting System</h1>
+    <img src="https://via.placeholder.com/50x50?text=LOGO" alt="Logo">
+    <h1 class="header-title">Admin Portal - Decentralized Voting</h1>
   </header>
 
   <main class="container mt-4">
     <!-- Select Region -->
     <section class="select-region">
-      <h2>Select Region</h2>
+      <h2><i class="fas fa-map-marker-alt icon"></i>Select Region</h2>
       <div class="form-group">
         <label for="region">Region:</label>
-        <select class="form-control" id="region" name="region" required></select>
+        <select class="form-control bg-dark text-white" id="region" name="region" required></select>
       </div>
     </section>
 
     <!-- Retrieve and Add Teams -->
     <section class="retrieve-teams">
-      <h2>Retrieve and Add Teams</h2>
-      <button class="btn btn-primary" id="retrieveTeams">Retrieve Teams</button>
+      <h2><i class="fas fa-users icon"></i>Retrieve and Add Teams</h2>
+      <button class="btn btn-primary" id="retrieveTeams"><i class="fas fa-sync-alt"></i>Retrieve Teams</button>
       <form id="teamForm" style="display:none;">
         <div id="teamCheckboxes"></div>
-        <button type="button" class="btn btn-success mt-3" id="addSelectedTeams">Add Selected Teams</button>
+        <button type="button" class="btn btn-success mt-3" id="addSelectedTeams"><i class="fas fa-plus"></i>Add Selected Teams</button>
       </form>
     </section>
 
     <!-- Add Candidate -->
-    <section class="add-candidate" style="display:none;">
+    <section class="add-candidate mt-4">
+      <h2><i class="fas fa-user-plus icon"></i>Add Candidate</h2>
       <div class="form-group" id="teamSelector" style="display:none;">
         <label for="team">Select Team (For GRC):</label>
-        <select class="form-control" id="team" name="team"></select>
+        <select class="form-control bg-dark text-white" id="team" name="team"></select>
       </div>
+    </section>
 
-
-    <!-- Display Candidates (New Section for Displaying Candidates) -->
+    <!-- Display Candidates -->
     <section class="display-candidates mt-4">
-      <h2>Candidates</h2>
-      <button class="btn btn-primary" id="getCandidates">Get Candidates</button>
+      <h2><i class="fas fa-vote-yea icon"></i>Candidates</h2>
+      <button class="btn btn-primary" id="getCandidates"><i class="fas fa-search"></i>Get Candidates</button>
       <form id="candidateForm" style="display:none;">
         <div id="candidateCheckboxes" class="mt-3">
           <!-- Candidate checkboxes will be dynamically inserted here -->
         </div>
-        <button type="button" class="btn btn-success mt-3" id="addSelectedCandidates">Add Selected Candidates</button>
+        <button type="button" class="btn btn-success mt-3" id="addSelectedCandidates"><i class="fas fa-plus"></i>Add Selected Candidates</button>
       </form>
     </section>
 
-
     <!-- Dashboard -->
     <section class="dashboard mt-4">
-      <h2>Dashboard</h2>
+      <h2><i class="fas fa-tachometer-alt icon"></i>Dashboard</h2>
       <div id="dashboardContent"></div>
     </section>
+
+    <!-- Button to End Voting for All Regions -->
+    <button id="endVotingButton" class="btn btn-danger">
+      <i class="fas fa-times-circle"></i> End Voting for All Regions
+    </button>
+
+    <!-- Button to Get Winning Candidates for Each Region -->
+    <button id="getWinningCandidatesButton" class="btn btn-primary">
+      <i class="fas fa-trophy"></i> Get Winning Candidates
+    </button>
+
+    <!-- Container to Display Winning Candidates -->
+    <div id="winningCandidatesContainer" class="mt-4">
+      <!-- Winning candidates will be dynamically inserted here -->
+    </div>
+  </div>
+
+
   </main>
 
   <script src="../dist/admin.bundle.js" type="module"></script>

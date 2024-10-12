@@ -29,14 +29,26 @@ window.Admin = {
         VotingFactoryContract.defaults({ from: accounts[0], gas: 6654755 });
         VotingContract.defaults({ from: accounts[0], gas: 6654755 });
 
+
         Admin.web3 = web3;
         Admin.factoryInstance = await VotingFactoryContract.deployed();
+        console.log("VotingFactory Contract Address:", Admin.factoryInstance.address);
+
+        // Check if Admin.account is the owner
+        const ownerAddress = await Admin.factoryInstance.owner();
+        console.log("Owner Address:", ownerAddress);
+        console.log("Admin Account:", Admin.account);
+
 
         document.getElementById('region').addEventListener('change', Admin.handleRegionChange);
         document.getElementById('retrieveTeams').addEventListener('click', Admin.retrieveTeams); // For retrieving teams
         document.getElementById('addSelectedTeams').addEventListener('click', Admin.addSelectedTeams); // For adding selected teams
         document.getElementById('getCandidates').addEventListener('click', Admin.retrieveCandidates); // New handler to retrieve candidates
         document.getElementById('addSelectedCandidates').addEventListener('click', Admin.addSelectedCandidates); // Add selected candidates
+
+        document.getElementById('getWinningCandidatesButton').addEventListener('click', Admin.getWinningCandidates);
+        document.getElementById('endVotingButton').addEventListener('click', Admin.endVotingForAllRegions);
+
 
         // Fetch regions and populate the dropdowns
         await Admin.fetchAllRegions();
@@ -51,6 +63,8 @@ window.Admin = {
 
   fetchAllRegions: async function () {
     try {
+      console.log("VotingFactory Contract Address when correct 1:", Admin.factoryInstance.address);
+
       const regions = await Admin.factoryInstance.getAllRegions();
       Admin.populateRegionDropdown(regions);
       if (regions.length > 0) {
@@ -115,6 +129,8 @@ window.Admin = {
     const selectedTeam = document.getElementById('team').value;
 
     const region = document.getElementById('region').value;
+    console.log("VotingFactory Contract Address when correct 2:", Admin.factoryInstance.address);
+
     const votingContractAddress = await Admin.factoryInstance.getVotingContractByRegion(region);
     const contractInstance = new Admin.web3.eth.Contract(VotingContract.abi, votingContractAddress);
 
@@ -195,6 +211,7 @@ addSelectedCandidates: async function () {
     alert('Please select at least one candidate.');
     return;
   }
+  console.log("VotingFactory Contract Address when correct 3:", Admin.factoryInstance.address);
 
   const votingContractAddress = await Admin.factoryInstance.getVotingContractByRegion(document.getElementById('region').value);
   const contractInstance = new Admin.web3.eth.Contract(VotingContract.abi, votingContractAddress);
@@ -376,6 +393,42 @@ addSelectedTeams: async function () {
       }
     });
   },
+
+  endVotingForAllRegions: async function () {
+    try {
+      // Print the address of the VotingFactory contract
+      console.log("VotingFactory Contract Address:", Admin.factoryInstance.address);
+  
+      // Attempt to end voting for all regions
+      await Admin.factoryInstance.endVotingProcessForAllRegions();
+      alert("Voting ended for all regions.");
+    } catch (error) {
+      console.error("Failed to end voting for all regions:", error);
+      alert("Failed to end voting for all regions. Check console for details.");
+    }
+  },
+
+// Function to get and display winning candidates for each region
+getWinningCandidates: async function () {
+  try {
+    const winningCandidates = await Admin.factoryInstance.getWinningCandidates();
+    Admin.renderWinningCandidates(winningCandidates);
+  } catch (error) {
+    console.error("Failed to retrieve winning candidates:", error);
+  }
+},
+
+// Render function for displaying winning candidates
+renderWinningCandidates: function (winningCandidates) {
+  const winningCandidatesContainer = document.getElementById("winningCandidatesContainer");
+  winningCandidatesContainer.innerHTML = ""; // Clear previous results
+
+  winningCandidates.forEach((winner, index) => {
+    const winnerDiv = document.createElement("div");
+    winnerDiv.innerHTML = `<strong>Region ${index + 1}:</strong> ${winner}`;
+    winningCandidatesContainer.appendChild(winnerDiv);
+  });
+},
 
   updateDashboard: async function (region) {
     try {

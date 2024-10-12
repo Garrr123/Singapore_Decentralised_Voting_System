@@ -76,48 +76,62 @@ window.App = {
 
   loadRegions: function() {
     VotingFactoryContract.deployed().then(function(instance) {
-      return instance.getDeployedVotingContracts();
+        return instance.getDeployedVotingContracts();
     }).then(function(contractAddresses) {
-      var regionsList = document.getElementById("regionsList");
-      regionsList.innerHTML = ""; // Clear existing list
+        var regionsList = document.getElementById("regionsList");
+        regionsList.innerHTML = ""; // Clear existing list
 
-      contractAddresses.forEach(function(address) {
-        VoterContract.at(address).then(function(contractInstance) {
-          return Promise.all([
-            contractInstance.region(),
-            contractInstance.minVotingAge(),
-            contractInstance.maxVoters(),
-            contractInstance.votingDate(),
-            contractInstance.votingStartTime(),
-            contractInstance.votingEndTime(),
-            address // Include the contract address
-          ]);
-        }).then(function(details) {
-          var region = details[0];
-          var minVotingAge = details[1];
-          var maxVoters = details[2];
-          var votingDate = new Date(details[3] * 1000).toLocaleDateString();
-          var votingStartTime = new Date(details[4] * 1000).toLocaleTimeString();
-          var votingEndTime = new Date(details[5] * 1000).toLocaleTimeString();
-          var contractAddress = details[6]; // Get the contract address
+        contractAddresses.forEach(function(address) {
+            VoterContract.at(address).then(function(contractInstance) {
+                return Promise.all([
+                    contractInstance.region(),
+                    contractInstance.minVotingAge(),
+                    contractInstance.maxVoters(),
+                    contractInstance.votingDate(),
+                    contractInstance.votingStartTime(),
+                    contractInstance.votingEndTime(),
+                    address // Include the contract address
+                ]);
+            }).then(function(details) {
+                var region = details[0];
+                var minVotingAge = details[1];
+                var maxVoters = details[2];
+                var votingDate = new Date(details[3] * 1000).toLocaleDateString();
+                var votingStartTime = new Date(details[4] * 1000).toLocaleTimeString();
+                var votingEndTime = new Date(details[5] * 1000).toLocaleTimeString();
+                var contractAddress = details[6]; // Get the contract address
 
-          var listItem = document.createElement("div");
-          listItem.innerHTML = `<strong>Region:</strong> ${region} <br>
-                                <strong>Min Voting Age:</strong> ${minVotingAge} <br>
-                                <strong>Max Voters:</strong> ${maxVoters} <br>
-                                <strong>Voting Date:</strong> ${votingDate} <br>
-                                <strong>Voting Start Time:</strong> ${votingStartTime} <br>
-                                <strong>Voting End Time:</strong> ${votingEndTime} <br>
-                                <strong>Contract Address:</strong> ${contractAddress}`;
-          regionsList.appendChild(listItem);
-        }).catch(function(err) {
-          console.error("Failed to load contract details. ERROR: " + err.message);
+                // Create a card for each region
+                var card = document.createElement("div");
+                card.className = "region-card";
+                card.style = `
+                    background-color: #333;
+                    color: #e0e0e0;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                `;
+
+                card.innerHTML = `
+                    <h4 style="color: #6a70dd;"><i class="fas fa-map-marker-alt"></i> ${region}</h4>
+                    <p><strong>Min Voting Age:</strong> ${minVotingAge}</p>
+                    <p><strong>Max Voters:</strong> ${maxVoters}</p>
+                    <p><strong>Voting Date:</strong> ${votingDate}</p>
+                    <p><strong>Voting Start Time:</strong> ${votingStartTime}</p>
+                    <p><strong>Voting End Time:</strong> ${votingEndTime}</p>
+                    <p><strong>Contract Address:</strong> <span style="color: #6a70dd;">${contractAddress}</span></p>
+                `;
+
+                regionsList.appendChild(card);
+            }).catch(function(err) {
+                console.error("Failed to load contract details. ERROR: " + err.message);
+            });
         });
-      });
     }).catch(function(err) {
-      console.error("Failed to load regions. ERROR: " + err.message);
-      document.getElementById("result").innerHTML = "Failed to load regions. ERROR: " + err.message;
-      document.getElementById("result").style.color = "red";
+        console.error("Failed to load regions. ERROR: " + err.message);
+        document.getElementById("result").innerHTML = "Failed to load regions. ERROR: " + err.message;
+        document.getElementById("result").style.color = "red";
     });
   },
 

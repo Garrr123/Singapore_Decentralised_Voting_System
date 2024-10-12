@@ -44,6 +44,9 @@ contract VoterContract {
     uint public minVotingAge;
     uint public maxVoters;
     bool public votingEnded;
+    address public factory;  // Factory address to be set in constructor
+
+    string public winningTeam; // Stores the winning team for each region
 
     event VotingTokenGenerated(address indexed voter, bytes32 votingToken);
     event VoterRegistered(address indexed voter, bytes32 votingToken);
@@ -61,8 +64,14 @@ contract VoterContract {
         _;
     }
 
+    modifier onlyAuthorized() {
+        require(msg.sender == owner || msg.sender == factory, "Only owner or factory");
+        _;
+    }
+
     constructor(
         address creator,
+        address _factory,  // Add factory address parameter
         string memory _region,
         bool _isGRC,
         uint256 _votingDate,
@@ -72,6 +81,7 @@ contract VoterContract {
         uint _maxVoters
     ) {
         owner = creator == address(0) ? msg.sender : creator;
+        factory = _factory;
         region = bytes(_region).length == 0 ? "default" : _region;
         isGRC = _isGRC;
         votingDate = _votingDate == 0 ? block.timestamp : _votingDate;
@@ -235,9 +245,36 @@ contract VoterContract {
         return (ids, names, parties, voteCounts);
     }
 
-    function endVoting() public onlyOwner {
+    function endVoting() public onlyAuthorized {
+        require(!votingEnded, "Voting has already ended.");
         votingEnded = true;
         emit VotingEnded(region);
+    }
+
+    // Public function to calculate and store the winning team/candidate
+    function calculateVote() public onlyAuthorized {
+        uint highestVotes = 0;
+
+        if (isGRC) {
+            for (uint i = 1; i <= countTeams; i++) {
+                if (teams[i].voteCount > highestVotes) {
+                    highestVotes = teams[i].voteCount;
+                    winningTeam = teams[i].name;
+                }
+            }
+        } else {
+            for (uint i = 1; i <= countCandidates; i++) {
+                if (candidates[i].voteCount > highestVotes) {
+                    highestVotes = candidates[i].voteCount;
+                    winningTeam = candidates[i].name;
+                }
+            }
+        }
+    }
+
+    function getWinningTeam() public view returns (string memory) {
+        require(votingEnded, "Voting is not ended yet.");
+        return winningTeam;
     }
 
     function checkVotingStatus() public view returns (bool) {

@@ -4,6 +4,8 @@ var VoterContract = artifacts.require("VoterContract");
 module.exports = async function(deployer, network, accounts) {
   // Deploy the VotingFactory contract
   await deployer.deploy(VotingFactory);
+  const votingFactoryInstance = await VotingFactory.deployed();
+
   
   const defaultRegion = "defaultRegion";
   const isGRC = true;  // Assuming this is a GRC, change to false if it's an SMC
@@ -14,5 +16,13 @@ module.exports = async function(deployer, network, accounts) {
   const maxVoters = 1000;
   
   // Deploy the VoterContract with the isGRC flag
-  await deployer.deploy(VoterContract, accounts[0], defaultRegion, isGRC, votingDate, votingStartTime, votingEndTime, minVotingAge, maxVoters);
+  await deployer.deploy(VoterContract, accounts[0],    
+    votingFactoryInstance.address,  // VotingFactory's address as the factory
+    defaultRegion, 
+    isGRC,
+    votingDate, 
+    votingStartTime, 
+    votingEndTime, 
+    minVotingAge, 
+    maxVoters);
 };
